@@ -37,6 +37,10 @@ Para atualizar: troque os arquivos e faça commit. O `sw.js` usa "rede primeiro"
 - **Assistente** — perguntas em português sobre o cronograma ("o que tem essa semana?", "incompletos", "atrasados", "meta", "relatório", "tendências"…). Digite `ajuda`.
 - **Ajustes** — instalar, notificações, **avisos de produção**, **sincronização**, **chave da IA**, agenda do celular (.ics), nome do app, backup.
 
+## No notebook
+
+O mesmo endereço funciona no computador: a navegação vira uma barra lateral, a agenda mostra o mês e o dia lado a lado, a semana ganha colunas, clientes e leads viram grade, e as telas de edição abrem como janelas centradas. Atalhos de teclado: `N` novo post, `1` a `5` trocam de aba, `M` mês, `S` semana, `T` hoje, setas mudam o mês ou a semana, `Esc` fecha.
+
 ## Avisos de produção
 
 Além do lembrete na hora do post, o app avisa (notificação + banner) quando:
