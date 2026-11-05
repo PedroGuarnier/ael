@@ -519,6 +519,36 @@
     #monthView{grid-template-columns:minmax(0,1.3fr) minmax(360px,.7fr)}
   }
 
+  /* ---- login / usuário / caderno */
+  #gate{position:fixed;inset:0;z-index:100;background:radial-gradient(120% 140% at 0% 0%,#8e1a2f 0%,var(--accent) 55%,#5c0512 100%);color:var(--cream);display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto}
+  #gate.hidden{display:none}
+  .gate-box{width:100%;max-width:380px;text-align:center;animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+  .gate-box .logo{width:120px;height:120px;border-radius:50%;margin:0 auto 18px;box-shadow:0 0 0 3px rgba(241,227,209,.35),0 20px 50px rgba(0,0,0,.35);background:var(--accent);display:grid;place-items:center;position:relative;overflow:hidden}
+  .gate-box .logo span{font-family:var(--serif);font-size:52px;color:var(--cream)}
+  .gate-box .logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
+  .gate-box .logo img.ok{opacity:1}
+  .gate-box .kicker{font-size:10px;letter-spacing:.26em;text-transform:uppercase;font-weight:700;opacity:.8}
+  .gate-box h1{font-family:var(--serif);font-size:38px;font-weight:600;margin:4px 0 22px;line-height:1}
+  .gate-box .input{background:rgba(255,255,255,.1);border-color:rgba(241,227,209,.3);color:var(--cream);margin-bottom:10px;text-align:left}
+  .gate-box .input::placeholder{color:rgba(241,227,209,.55)}
+  .gate-box .input:focus{border-color:var(--cream)}
+  .gate-box .btn{background:var(--cream);color:var(--accent);margin-top:6px}
+  .gate-box .btn.ghost{background:rgba(255,255,255,.1);color:var(--cream)}
+  .gate-box .err{min-height:20px;font-size:13px;font-weight:700;color:#ffd1d1;margin-top:10px}
+  .gate-box .note{font-size:12px;opacity:.75;margin-top:16px;line-height:1.5}
+  .userbtn{width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--cream);font-weight:800;font-size:15px;display:grid;place-items:center;margin-right:8px;box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--accent)}
+  .brandbar .right{display:flex;align-items:center}
+  .ucard{display:flex;gap:14px;align-items:center;background:#fff;border-radius:16px;padding:14px;margin:8px 0 14px;box-shadow:var(--shadow)}
+  .ucard .userbtn{width:54px;height:54px;font-size:22px;margin:0}
+  .ucard b{font-family:var(--serif);font-size:22px;display:block;line-height:1.1}
+  .ucard small{color:var(--muted);font-weight:700}
+  .notes{width:100%;min-height:52vh;border:1px solid var(--line);border-radius:16px;padding:16px;background:#fffaf0;font-family:var(--serif);font-size:19px;line-height:1.5;resize:vertical;outline:0;background-image:linear-gradient(transparent 0,transparent calc(1.5em - 1px),rgba(118,8,25,.08) calc(1.5em - 1px),rgba(118,8,25,.08) 1.5em);background-size:100% 1.5em;background-attachment:local;background-position:0 16px}
+  .notes:focus{border-color:var(--accent)}
+  .nstat{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700;margin-top:8px}
+  .home-hero .tagrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;border-top:1px solid rgba(241,227,209,.25);padding-top:10px}
+  .home-hero .tagrow .tag{margin:0;border:0;padding:0}
+  .home-hero .tagrow button{background:rgba(241,227,209,.14);color:var(--cream);font-size:12px;font-weight:800;padding:8px 12px;border-radius:999px;border:1px solid rgba(241,227,209,.3);white-space:nowrap}
+  @media (min-width:900px){.notes{min-height:60vh}.gate-box{max-width:420px}}
   /* ---- impressão do relatório */
   #printArea{display:none}
   @media print{
@@ -535,7 +565,7 @@
 
 <div class="shell">
 <header>
-  <div class="brandbar"><h1 id="appName">Agenda de Posts</h1><button class="iconbtn text" id="btnToday">Hoje</button></div>
+  <div class="brandbar"><h1 id="appName">Agenda de Posts</h1><div class="right"><button class="userbtn" id="userBtn" aria-label="Minha conta">?</button><button class="iconbtn text" id="btnToday">Hoje</button></div></div>
   <div class="monthnav" id="monthnav">
     <h2 id="monthTitle"></h2>
     <div class="navbtns"><button class="iconbtn" id="prevM">‹</button><button class="iconbtn" id="nextM">›</button></div>
@@ -567,7 +597,7 @@
   </section>
 
   <section class="view active" id="view-home">
-    <div class="home-hero"><div class="top"><div class="logo"><span>A&amp;L</span><img src="./logo.png" alt="" onload="this.classList.add('ok')" onerror="this.remove()"></div><div style="min-width:0"><div class="kicker">Social media + estratégia</div><div class="greet" id="homeGreet">Olá</div><div class="date" id="homeDate"></div></div></div><div class="tag">Conteúdo que posiciona.</div></div>
+    <div class="home-hero"><div class="top"><div class="logo"><span>A&amp;L</span><img src="./logo.png" alt="" onload="this.classList.add('ok')" onerror="this.remove()"></div><div style="min-width:0"><div class="kicker">Social media + estratégia</div><div class="greet" id="homeGreet">Olá</div><div class="date" id="homeDate"></div></div></div><div class="tagrow"><div class="tag">Conteúdo que posiciona.</div><button id="homeNotes">📓 Meu caderno</button></div></div>
     <div class="home-grid">
       <div>
         <div class="stats" id="homeStats"></div>
@@ -882,6 +912,50 @@
   </div>
 </div>
 
+<!-- SHEET: usuário -->
+<div class="sheet" id="userSheet">
+  <div class="handle"></div>
+  <h3><span>Minha conta</span><button id="btnCloseUser">Fechar</button></h3>
+  <div id="userBody"></div>
+</div>
+
+<!-- SHEET: caderno -->
+<div class="sheet" id="notesSheet">
+  <div class="handle"></div>
+  <h3><span id="notesTitle">Meu caderno</span><button id="btnCloseNotes">Fechar</button></h3>
+  <div class="hint" style="margin-bottom:10px">Anotações só suas. Salva sozinho e sincroniza entre seus aparelhos.</div>
+  <textarea class="notes" id="notesText" placeholder="Ideias, recados, lembretes, pautas…"></textarea>
+  <div class="nstat"><span id="notesStat"></span><span id="notesCount"></span></div>
+</div>
+
+<!-- SHEET: senha -->
+<div class="sheet" id="pwSheet">
+  <div class="handle"></div>
+  <h3><span id="pwTitle">Definir senha</span><button id="btnClosePw">Fechar</button></h3>
+  <p class="hint" id="pwHint" style="margin-bottom:6px">Escolha uma senha nova para a sua conta.</p>
+  <label class="field">Nova senha</label><input class="input" type="password" id="pwNew" autocomplete="new-password" placeholder="mínimo 6 caracteres">
+  <label class="field">Repita a nova senha</label><input class="input" type="password" id="pwNew2" autocomplete="new-password">
+  <div id="pwCurWrap" class="hidden"><label class="field">Senha atual</label><input class="input" type="password" id="pwCur" autocomplete="current-password"></div>
+  <div class="actions"><button class="btn" id="pwSave">Salvar senha</button><button class="btn ghost" id="pwLater">Agora não</button></div>
+</div>
+
+<!-- LOGIN -->
+<div id="gate">
+  <form class="gate-box" id="gateForm" autocomplete="on">
+    <div class="logo"><span>A&amp;L</span><img src="./logo.png" alt="" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+    <div class="kicker">Social media + estratégia</div>
+    <h1>Entrar</h1>
+    <div id="gateFields">
+      <input class="input" type="email" id="gateEmail" placeholder="seu e-mail" autocapitalize="none" autocomplete="username" inputmode="email">
+      <input class="input" type="password" id="gatePw" placeholder="senha" autocomplete="current-password">
+      <button class="btn" type="submit" id="gateBtn">Entrar</button>
+    </div>
+    <div id="gateWait" class="hidden"><span class="spin"></span> Verificando…</div>
+    <div class="err" id="gateErr"></div>
+    <div class="note" id="gateNote">Use o e-mail e a senha que a equipe passou. No primeiro acesso dá para trocar a senha.</div>
+  </form>
+</div>
+
 <!-- SHEET: lead -->
 <div class="sheet" id="leadSheet">
   <div class="handle"></div>
@@ -1017,7 +1091,7 @@ $('#btnAddDay').onclick=()=>openSheet(null);
 function countUp(el,from,to){if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||from===to){el.textContent=to;return;}const t0=performance.now(),d=600;const step=t=>{const k=Math.min(1,(t-t0)/d);const e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
 function renderHome(){
   const now=new Date();const h=now.getHours();const tk=ymd(today);
-  $('#homeGreet').textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', A&L';
+  $('#homeGreet').textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', '+(AUTH.user?AUTH.name():'A&L');
   $('#homeDate').textContent=DOWS[now.getDay()].charAt(0).toUpperCase()+DOWS[now.getDay()].slice(1)+', '+now.getDate()+' de '+MONTHS[now.getMonth()].toLowerCase();
   const lim=ymd(addDays(today,7));const tp=posts.filter(p=>visible(p)&&p.date===tk).length;const pend=posts.filter(p=>visible(p)&&p.status!=='postado'&&p.date<=lim&&missing(p).length).length;const late=posts.filter(p=>visible(p)&&p.status!=='postado'&&parse(p)<now).length;
   const hs=$('#homeStats');const prev=(hs.dataset.v||'').split(',').map(Number);const vals=[tp,pend,late];
@@ -1097,7 +1171,7 @@ function openSheet(id,prefill){
   $('#overlay').classList.add('open');$('#sheet').classList.add('open');$('#sheet').scrollTop=0;
 }
 function closeSheets(){$('#overlay').classList.remove('open');document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));}
-$('#overlay').onclick=closeSheets;$('#btnCloseSheet').onclick=closeSheets;$('#btnClosePub').onclick=closeSheets;$('#btnCloseCli').onclick=closeSheets;$('#btnClosePlan').onclick=closeSheets;$('#btnCloseRep').onclick=closeSheets;$('#btnCloseRadar').onclick=closeSheets;
+$('#overlay').onclick=closeSheets;$('#btnCloseSheet').onclick=closeSheets;$('#btnClosePub').onclick=closeSheets;$('#btnCloseCli').onclick=closeSheets;$('#btnClosePlan').onclick=closeSheets;$('#btnCloseRep').onclick=closeSheets;$('#btnCloseRadar').onclick=closeSheets;$('#btnCloseUser').onclick=closeSheets;$('#btnCloseNotes').onclick=closeSheets;$('#btnClosePw').onclick=closeSheets;
 function openOnly(id){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));$('#overlay').classList.add('open');const s=$(id);s.classList.add('open');s.scrollTop=0;}
 document.querySelectorAll('.tabs2 button').forEach(b=>b.onclick=()=>switchTab(b.dataset.t));
 function switchTab(t){document.querySelectorAll('.tabs2 button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));$('#tabEdit').classList.toggle('hidden',t!=='edit');$('#tabPreview').classList.toggle('hidden',t!=='preview');if(t==='preview')renderPreview();}
@@ -1792,10 +1866,10 @@ const SYNC={
   norm(col,val,id){const o=Object.assign({},val,{id});if(col==='leads')return normLead(o);if(col==='posts'){if(!Array.isArray(o.photos))o.photos=o.photos?Object.values(o.photos):[];if(!Array.isArray(o.check))o.check=CHECKLIST.map((_,i)=>!!(o.check&&o.check[i]));return normPost(o);}
     if(!Array.isArray(o.pillars))o.pillars=o.pillars?Object.values(o.pillars):[];if(!Array.isArray(o.ideas))o.ideas=o.ideas?Object.values(o.ideas):[];if(o.template&&!Array.isArray(o.template))o.template=Object.values(o.template);if(o.months)Object.values(o.months).forEach(m=>{if(m&&m.weeks&&!Array.isArray(m.weeks))m.weeks=Object.values(m.weeks);});if(o.radar&&o.radar.ideas&&!Array.isArray(o.radar.ideas))o.radar.ideas=Object.values(o.radar.ideas);if(o.radar&&o.radar.trends&&!Array.isArray(o.radar.trends))o.radar.trends=Object.values(o.radar.trends);return normBrand(o);},
   // ---- boot / sdk
-  boot(){this.handleJoin();if(this.cfg)this.start();window.addEventListener('online',()=>{if(this.cfg&&!this.on)this.start();});},
+  boot(){this.handleJoin();window.addEventListener('online',()=>{if(this.cfg&&!this.on&&AUTH.user)this.start();});},
   loadSdk(){if(window.firebase&&firebase.database)return Promise.resolve();const v='10.14.1';return ['app','auth','database'].reduce((p,n)=>p.then(()=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=`https://www.gstatic.com/firebasejs/${v}/firebase-${n}-compat.js`;s.onload=res;s.onerror=()=>rej(new Error('Sem internet para carregar a sincronização'));document.head.appendChild(s);})),Promise.resolve());},
   start(){if(this.on||this.starting||!this.cfg)return;this.starting=true;this.err='';this.renderStatus();
-    this.loadSdk().then(()=>{if(!firebase.apps.length)firebase.initializeApp(this.cfg.firebase);this.ref=firebase.database().ref('ws/'+this.cfg.code);return firebase.auth().signInAnonymously().catch(e=>{this.err='Login anônimo não ativado no Firebase ('+(e.code||e.message)+')';});})
+    this.loadSdk().then(()=>{if(!firebase.apps.length)firebase.initializeApp(this.cfg.firebase);this.ref=firebase.database().ref('ws/'+this.cfg.code);if(!firebase.auth().currentUser)throw new Error('Entre com seu e-mail e senha para sincronizar');})
       .then(()=>{this.on=true;this.listen();this.renderStatus();}).catch(e=>{this.err=e.message||String(e);this.renderStatus();}).finally(()=>{this.starting=false;this.renderStatus();});},
   listen(){const self=this;
     ['posts','brands','leads'].forEach(col=>{const r=self.ref.child(col);
@@ -1851,13 +1925,19 @@ const SYNC={
   invite(){return btoa(unescape(encodeURIComponent(JSON.stringify({f:this.cfg.firebase,c:this.cfg.code}))));},
   inviteLink(){return location.origin+location.pathname+'#join='+this.invite();},
   decodeInvite(s){s=String(s||'').trim();const m=s.match(/join=([A-Za-z0-9+/=_-]+)/);if(m)s=m[1];try{const o=JSON.parse(decodeURIComponent(escape(atob(s))));if(o&&o.f&&o.c&&o.f.apiKey)return {firebase:o.f,code:String(o.c)};}catch{}return null;},
-  enable(c){this.cfg=c;save('al_sync',c);this.hashes={posts:{},brands:{},leads:{}};this.imgs={};this.saveMeta();this.start();},
+  enable(c){this.cfg=c;save('al_sync',c);this.hashes={posts:{},brands:{},leads:{}};this.imgs={};this.saveMeta();if(AUTH.user)this.start();this.publishTeam();},
+  publishTeam(){if(!this.cfg||!window.firebase||!firebase.apps.length||!firebase.auth().currentUser)return;firebase.database().ref('team').once('value').then(s=>{const t=s.val();if(!t||!t.code)return firebase.database().ref('team').set({code:this.cfg.code,by:AUTH.user.email,at:Date.now()});}).catch(()=>{});},
+  // ao entrar: entra na equipe sozinho (lê /team), ou cria a equipe se for o primeiro
+  async afterLogin(){if(this.cfg){this.start();this.publishTeam();return;}
+    try{const s=await firebase.database().ref('team').once('value');const t=s.val();if(t&&t.code){this.enable({firebase:DEFAULT_FIREBASE,code:String(t.code)});toast('Você entrou na equipe','Cronograma compartilhado ativado',null,2400);return;}
+      const code=this.genCode();await firebase.database().ref('team').set({code,by:AUTH.user.email,at:Date.now()});this.enable({firebase:DEFAULT_FIREBASE,code});toast('Equipe criada','Os próximos logins entram sozinhos',null,2400);}
+    catch(e){this.err='Não consegui ler a equipe: confira as regras do banco ('+(e.code||e.message)+')';this.renderStatus();}},
   handleJoin(){const m=location.hash.match(/join=([^&]+)/);if(!m)return;const c=this.decodeInvite(m[1]);history.replaceState(null,'',location.pathname+location.search);if(!c){toast('Convite inválido','',null,2000);return;}
     if(this.cfg&&this.cfg.code===c.code)return;save('al_sync',c);this.cfg=c;this.hashes={posts:{},brands:{},leads:{}};this.imgs={};this.saveMeta();toast('Convite aceito','Sincronização ligada neste aparelho',null,2500);},
   disable(){try{localStorage.removeItem('al_sync');localStorage.removeItem('al_sync_h');localStorage.removeItem('al_sync_i');}catch{}location.reload();},
   renderStatus(){const s=$('#syncStatus');if(!s)return;const on=!!this.cfg;$('#syncSetup').classList.toggle('hidden',on);$('#syncOn').classList.toggle('hidden',!on);
     if(!on){s.className='sync-st';s.querySelector('span').textContent='Desligado — os dados ficam só neste aparelho';if(!$('#syncCode').value)$('#syncCode').value=this.genCode();if(!$('#syncConfig').value.trim())$('#syncConfig').value=JSON.stringify(DEFAULT_FIREBASE,null,2);return;}
-    const txt=this.err?this.err:(!this.on?(this.starting?'Conectando…':'Aguardando internet'):(this.conn?'Sincronizado · código '+this.cfg.code:'Sem conexão — as alterações serão enviadas quando voltar'));
+    const txt=this.err?this.err:(!this.on?(this.starting?'Conectando…':(AUTH.user?'Aguardando internet':'Entre na sua conta para sincronizar')):(this.conn?'Sincronizado · código '+this.cfg.code:'Sem conexão — as alterações serão enviadas quando voltar'));
     s.className='sync-st '+(this.err?'off':(this.on&&this.conn?'on':'wait'));s.querySelector('span').textContent=txt;}
 };
 $('#syncSave').onclick=()=>{const f=SYNC.parseConfig($('#syncConfig').value);if(!f){toast('Configuração inválida','Cole o trecho firebaseConfig completo',null,2500);return;}const code=($('#syncCode').value.trim()||SYNC.genCode()).replace(/[^\w-]/g,'');if(code.length<6){toast('Código muito curto','',null,1500);return;}
@@ -1869,10 +1949,59 @@ $('#syncShare').onclick=async()=>{const l=SYNC.inviteLink();if(navigator.share){
 $('#syncNow').onclick=()=>{if(!SYNC.on){SYNC.start();toast('Conectando…','',null,1500);return;}SYNC.push();SYNC.fetchMissing();toast('Sincronizando','',null,1200);};
 $('#syncOff').onclick=()=>confirmBox('Desligar a sincronização neste aparelho? Os dados continuam aqui e no outro celular.',()=>SYNC.disable());
 
+// ============================================================ LOGIN (Firebase Authentication, e-mail e senha)
+const AUTH={user:null,ready:false,offline:false,
+  cached(){return load('al_auth_user',null);},
+  async init(){$('#gateWait').classList.remove('hidden');$('#gateFields').classList.add('hidden');
+    try{await SYNC.loadSdk();}catch(e){const c=this.cached();if(c){this.offline=true;this.user=c;this.ready=true;this.enter();return;}this.showGate('Sem internet para entrar. Conecte e tente de novo.');return;}
+    if(!firebase.apps.length)firebase.initializeApp((SYNC.cfg&&SYNC.cfg.firebase)||DEFAULT_FIREBASE);
+    firebase.auth().onAuthStateChanged(u=>{this.ready=true;if(u){this.user=u;save('al_auth_user',{uid:u.uid,email:u.email,displayName:u.displayName||''});this.enter();}else{this.user=null;this.showGate('');}});},
+  showGate(msg){$('#gate').classList.remove('hidden');$('#gateWait').classList.add('hidden');$('#gateFields').classList.remove('hidden');$('#gateErr').textContent=msg||'';$('#gateBtn').disabled=false;$('#gateBtn').textContent='Entrar';},
+  msg(e){const c=e.code||'';if(c==='auth/operation-not-allowed')return 'Login por e-mail não está ativado no Firebase (Authentication › Métodos de login › E-mail/senha).';if(/wrong-password|invalid-credential|invalid-login|user-not-found|invalid-email/.test(c))return 'E-mail ou senha incorretos.';if(c==='auth/too-many-requests')return 'Muitas tentativas. Aguarde um pouco e tente de novo.';if(c==='auth/network-request-failed')return 'Sem internet.';if(c==='auth/weak-password')return 'Senha muito curta (mínimo 6 caracteres).';if(c==='auth/requires-recent-login')return 'Por segurança, informe a senha atual.';return e.message||'Não foi possível entrar.';},
+  async login(email,pw){email=String(email||'').trim().toLowerCase();if(!email||!pw)throw new Error('Preencha e-mail e senha.');try{await firebase.auth().signInWithEmailAndPassword(email,pw);}catch(e){throw new Error(this.msg(e));}},
+  name(){const u=this.user;if(!u)return '';return (u.displayName||String(u.email||'').split('@')[0]).replace(/^./,c=>c.toUpperCase());},
+  initial(){return (this.name()||'?').charAt(0).toUpperCase();},
+  async enter(){$('#gate').classList.add('hidden');$('#userBtn').textContent=this.initial();renderHome();
+    if(this.offline){toast('Modo offline','Entrou como '+this.name()+' · sem sincronização',null,2500);NOTES.load();return;}
+    await SYNC.afterLogin();NOTES.load();
+    const prof=await this.profile();if(!(prof&&prof.pwChanged)&&!load('al_pw_later_'+this.user.uid,false))setTimeout(()=>this.openPw(true),600);
+    if(!prof||!prof.name)this.saveProfile({name:this.name(),email:this.user.email});},
+  async profile(){try{const s=await firebase.database().ref('profiles/'+this.user.uid).once('value');return s.val();}catch{return null;}},
+  saveProfile(o){try{firebase.database().ref('profiles/'+this.user.uid).update(Object.assign({at:Date.now()},o)).catch(()=>{});}catch{}},
+  openPw(first){$('#pwTitle').textContent=first?'Defina sua senha':'Trocar senha';$('#pwHint').textContent=first?'Primeiro acesso: escolha uma senha só sua. Dá para fazer depois em Minha conta.':'Escolha uma senha nova.';$('#pwNew').value='';$('#pwNew2').value='';$('#pwCur').value='';$('#pwCurWrap').classList.toggle('hidden',!!first);$('#pwLater').classList.toggle('hidden',!first);openOnly('#pwSheet');},
+  async changePassword(){const a=$('#pwNew').value,b=$('#pwNew2').value,cur=$('#pwCur').value;if(a.length<6){toast('Senha muito curta','mínimo 6 caracteres',null,1600);return;}if(a!==b){toast('As senhas não conferem','',null,1600);return;}
+    const u=window.firebase&&firebase.apps.length?firebase.auth().currentUser:null;if(!u){toast('Sem conexão com o login','',null,1600);return;}
+    try{if(cur){await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,cur));}await u.updatePassword(a);this.saveProfile({pwChanged:true});try{localStorage.removeItem('al_pw_later_'+u.uid);}catch{}closeSheets();toast('Senha atualizada','Use a nova senha no próximo login',null,2400);}
+    catch(e){if((e.code||'')==='auth/requires-recent-login'){$('#pwCurWrap').classList.remove('hidden');toast('Informe a senha atual','',null,1800);}else toast('Não deu para trocar',this.msg(e),null,3500);}},
+  openUser(){const u=this.user;if(!u)return;const st=SYNC.cfg?(SYNC.on&&SYNC.conn?'Sincronizado · equipe '+SYNC.cfg.code:(SYNC.err||'Conectando…')):(this.offline?'Modo offline':'Sem equipe ainda');
+    $('#userBody').innerHTML=`<div class="ucard"><div class="userbtn">${esc(this.initial())}</div><div><b>${esc(this.name())}</b><small>${esc(u.email||'')}</small></div></div>
+      <div class="sync-st ${SYNC.on&&SYNC.conn?'on':(SYNC.err?'off':'wait')}"><i></i><span>${esc(st)}</span></div>
+      <button class="btn" id="uNotes">📓 Meu caderno</button><button class="btn ghost" id="uPw">Trocar senha</button><button class="btn ghost" id="uCfg">Ajustes</button><button class="btn danger" id="uOut" style="margin-top:14px">Sair da conta</button>`;
+    $('#uNotes').onclick=()=>NOTES.open();$('#uPw').onclick=()=>this.openPw(false);$('#uCfg').onclick=()=>{closeSheets();showView('cfg');};
+    $('#uOut').onclick=()=>confirmBox('Sair da conta neste aparelho? Os dados continuam na equipe.',async()=>{try{localStorage.removeItem('al_auth_user');}catch{}try{if(window.firebase&&firebase.apps.length)await firebase.auth().signOut();}catch{}location.reload();});
+    openOnly('#userSheet');}
+};
+$('#gateForm').onsubmit=async e=>{e.preventDefault();const b=$('#gateBtn');b.disabled=true;b.innerHTML='<span class="spin"></span>Entrando…';$('#gateErr').textContent='';
+  try{await AUTH.login($('#gateEmail').value,$('#gatePw').value);}catch(err){$('#gateErr').textContent=err.message;b.disabled=false;b.textContent='Entrar';}};
+$('#userBtn').onclick=()=>AUTH.openUser();$('#pwSave').onclick=()=>AUTH.changePassword();$('#pwLater').onclick=()=>{try{localStorage.setItem('al_pw_later_'+AUTH.user.uid,'1');}catch{}closeSheets();};
+
+// ============================================================ CADERNO PESSOAL
+const NOTES={text:'',at:0,t:null,ref:null,
+  key(){return 'al_notes_'+(AUTH.user?AUTH.user.uid:'anon');},
+  load(){const l=load(this.key(),{text:'',at:0});this.text=l.text||'';this.at=l.at||0;this.listen();},
+  listen(){if(!SYNC.cfg||!window.firebase||!firebase.apps.length||!AUTH.user||this.ref||AUTH.offline)return;this.ref=firebase.database().ref('notes/'+SYNC.cfg.code+'/'+AUTH.user.uid);
+    this.ref.on('value',s=>{const r=s.val();if(!r)return;if((r.at||0)>this.at){this.text=r.text||'';this.at=r.at;save(this.key(),{text:this.text,at:this.at});if($('#notesSheet').classList.contains('open')&&document.activeElement!==$('#notesText'))this.render();}},()=>{});},
+  render(){$('#notesText').value=this.text;this.stat();},
+  stat(){$('#notesStat').textContent=this.at?'Salvo '+new Date(this.at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'Nada salvo ainda';$('#notesCount').textContent=(this.text||'').length.toLocaleString('pt-BR')+' caracteres';},
+  open(){if(!AUTH.user){toast('Entre na sua conta primeiro','',null,1500);return;}this.listen();$('#notesTitle').textContent='Caderno de '+AUTH.name();this.render();openOnly('#notesSheet');setTimeout(()=>$('#notesText').focus(),350);},
+  change(v){this.text=v;this.at=Date.now();clearTimeout(this.t);$('#notesStat').textContent='Salvando…';this.t=setTimeout(()=>{save(this.key(),{text:this.text,at:this.at});if(this.ref)this.ref.set({text:this.text,at:this.at}).catch(()=>{});this.stat();},700);}
+};
+$('#notesText').oninput=e=>NOTES.change(e.target.value);$('#homeNotes').onclick=()=>NOTES.open();
+
 // ---------- atalhos de teclado (notebook)
 document.addEventListener('keydown',e=>{const tag=(e.target.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select'||e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==='Escape'){closeSheets();return;}const anyOpen=document.querySelector('.sheet.open');if(anyOpen)return;
-  const map={n:()=>openSheet(null),'1':()=>showView('home'),'2':()=>showView('cal'),'3':()=>showView('chat'),'4':()=>showView('cli'),'5':()=>showView('cfg'),s:()=>{cfg.calMode='week';persist();showView('cal');},m:()=>{cfg.calMode='month';persist();showView('cal');},t:()=>$('#btnToday').click()};
+  const map={n:()=>openSheet(null),'1':()=>showView('home'),'2':()=>showView('cal'),'3':()=>showView('chat'),'4':()=>showView('cli'),'5':()=>showView('cfg'),c:()=>NOTES.open(),s:()=>{cfg.calMode='week';persist();showView('cal');},m:()=>{cfg.calMode='month';persist();showView('cal');},t:()=>$('#btnToday').click()};
   if(map[e.key]){e.preventDefault();map[e.key]();}
   if(view==='cal'&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();$(e.key==='ArrowLeft'?'#prevM':'#nextM').click();}});
 
@@ -1883,7 +2012,7 @@ $('#toast .close').onclick=()=>$('#toast').classList.remove('show');
 function confirmBox(msg,ok){const d=document.createElement('div');d.className='dialog';d.innerHTML=`<div class="box"><p>${esc(msg)}</p><div class="row"><button class="btn ghost">Cancelar</button><button class="btn danger">Confirmar</button></div></div>`;const [c,k]=d.querySelectorAll('button');c.onclick=()=>d.remove();k.onclick=()=>{d.remove();ok();};document.body.appendChild(d);}
 
 function renderAll(){renderChips();renderCalMode();renderCalendar();renderDay();renderHoje();if(view==='cli')renderClients();renderNotifStatus();renderInstall();SYNC.renderStatus();}
-(async()=>{await idb.open();await idb.loadAll();SYNC.boot();showView(view);renderChat();tick();})();
+(async()=>{await idb.open();await idb.loadAll();SYNC.boot();showView(view);renderChat();tick();AUTH.init();})();
 })();
 </script>
 </body>

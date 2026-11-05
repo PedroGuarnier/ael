@@ -50,42 +50,39 @@ Além do lembrete na hora do post, o app avisa (notificação + banner) quando:
 
 Valem as mesmas limitações das notificações abaixo (o app precisa estar aberto ou instalado em segundo plano).
 
+## Login, contas e caderno pessoal
+
+O app abre numa tela de login (e-mail e senha, pelo Firebase Authentication, sem SSO). Cada pessoa tem a sua conta, um **caderno pessoal** (botão "Meu caderno" na Início ou no avatar no topo) que só ela vê e que sincroniza entre os aparelhos dela, e pode trocar a senha em Minha conta (avatar no topo). No primeiro acesso o app sugere definir uma senha nova; dá para adiar.
+
+Ao entrar, a pessoa já cai na equipe: o primeiro login cria a equipe e os seguintes entram sozinhos, sem convite. Depois de logado, o app funciona offline (o login fica guardado no aparelho).
+
+Configuração no Firebase (uma vez, pelo administrador):
+
+1. **Authentication › Métodos de login**: ative **E-mail/senha**.
+2. **Authentication › Usuários › Adicionar usuário**: crie cada conta com e-mail e senha inicial. Nenhuma senha fica no código do app.
+3. **Realtime Database › Regras**: cole e publique as regras abaixo.
+4. Depois que todo mundo entrou pelo menos uma vez, pode desativar o método **Anônimo** em Métodos de login. A partir daí só quem tem conta acessa os dados.
+
+```json
+{
+  "rules": {
+    "ws": { "$code": { ".read": "auth != null", ".write": "auth != null" } },
+    "team": { ".read": "auth != null", ".write": "auth != null" },
+    "profiles": { "$uid": { ".read": "auth.uid == $uid", ".write": "auth.uid == $uid" } },
+    "notes": { "$code": { "$uid": { ".read": "auth.uid == $uid", ".write": "auth.uid == $uid" } } }
+  }
+}
+```
+
+Os cadernos ficam em `notes/<código da equipe>/<usuário>` e só o próprio usuário consegue ler. O nó `team` guarda o código da equipe para os logins seguintes entrarem sozinhos.
+
 ## Sincronizar entre celulares (Firebase)
 
-Para as duas verem e editarem o mesmo cronograma, o app usa o **Realtime Database** do Firebase (plano gratuito Spark é suficiente: posts são pequenos e as fotos são redimensionadas). Configura-se uma vez, em um celular, e o outro entra por um link de convite.
+A sincronização usa o **Realtime Database** do Firebase (plano gratuito Spark é suficiente). A configuração do projeto da A&L já vem embutida no app. Com o login feito, a equipe se forma sozinha; o convite por link (Ajustes › Sincronizar) continua existindo como alternativa.
 
-1. Entre em [console.firebase.google.com](https://console.firebase.google.com) com uma conta Google e crie um projeto (pode desligar o Analytics).
-2. **Criação → Realtime Database → Criar banco de dados** (qualquer região; comece em modo bloqueado). Na aba **Regras**, cole e publique:
+Com a sincronização ligada, as chaves da IA, do workspace e do Google Maps também são compartilhadas pelo mesmo canal: quem salvar uma chave num celular, o outro recebe sozinho (elas ficam no nó `keys` do mesmo workspace, protegido pelas mesmas regras).
 
-   ```json
-   {
-     "rules": {
-       "ws": {
-         "$code": {
-           ".read": "auth != null",
-           ".write": "auth != null"
-         }
-       }
-     }
-   }
-   ```
-
-3. **Criação → Authentication → Começar → Métodos de login → Anônimo → Ativar**.
-4. **Configurações do projeto (engrenagem) → Seus apps → Adicionar app → Web (</>)**. Dê um nome, registre e copie o trecho `const firebaseConfig = { ... }`.
-5. No app: **Ajustes → Sincronizar entre celulares**, cole o trecho, confira o código da equipe (ele funciona como senha; quem tem o código vê e edita tudo) e toque **Ligar sincronização**.
-6. Toque **Copiar convite** (ou **Compartilhar link**) e mande para o outro celular. Ao abrir o link, a sincronização liga sozinha. Também dá para usar **Colar convite recebido**.
-
-Com a sincronização ligada, as chaves da IA, do workspace e do Google Maps também são compartilhadas pelo mesmo canal: quem salvar uma chave num celular, o outro recebe sozinho (elas ficam no nó `keys` do mesmo workspace, protegido pelas mesmas regras e pelo código da equipe).
-
-Como funciona: cada post e cliente tem um carimbo de hora; a edição mais recente vence. As fotos sobem uma vez e são baixadas no outro aparelho quando faltam. Sem internet o app continua funcionando e envia as mudanças quando voltar. Notificações e ajustes são por aparelho (não sincronizam). A chave da IA também não sincroniza.
-
-## Prospecção de clientes (IA)
-
-Em **Clientes › Prospecção**. Escolha os bairros (Barra, Recreio, Tijuca, Zona Sul etc.), os segmentos e toque **Buscar possíveis clientes**. A IA pesquisa na web negócios pequenos e médios com ponto físico nesses bairros que não têm Instagram, têm Instagram fraco ou abriram há pouco, e devolve de 8 a 12 leads com segmento, bairro, endereço, @, telefone, sinais de oportunidade, abordagem sugerida para a visita, prioridade e fonte. Negócios já na lista ou já clientes não se repetem.
-
-Cada lead tem links de Instagram, mapa, site e WhatsApp, status (Novo → Contatado → Visita marcada → Proposta → Fechado/Perdido), prioridade, próximo passo com data e anotações. **Roteiro de visitas** agrupa os leads ativos por bairro em um texto para WhatsApp. **Virar cliente** cria o cliente a partir do lead. Em Ajustes dá para ligar um lembrete semanal; o app avisa na tela inicial quando a busca está vencida (a busca nunca roda sozinha, para não gerar custo sem querer).
-
-Importante: a IA pode errar ou citar um negócio que fechou. Leads marcados "a verificar" precisam de conferência no Google Maps ou Instagram antes da visita. Cada busca custa cerca de US$ 0,30 a 0,50 (até 10 buscas na web com o Sonnet 5.5).
+Como funciona: cada post, cliente e lead tem um carimbo de hora; a edição mais recente vence. As fotos sobem uma vez e são baixadas no outro aparelho quando faltam. Sem internet o app continua funcionando e envia as mudanças quando voltar. Notificações e ajustes são por aparelho (não sincronizam).
 
 ## Mapa da prospecção (OpenStreetMap, sem chave)
 

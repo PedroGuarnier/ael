@@ -1,5 +1,5 @@
 // Service worker — cache do app para abrir offline + clique em notificação
-const CACHE = 'al-posts-v6';
+const CACHE = 'al-posts-v7';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './logo.png'];
 
 self.addEventListener('install', e => {
@@ -15,6 +15,13 @@ self.addEventListener('activate', e => {
 // Rede primeiro para o próprio app (pega atualizações), cache como reserva offline
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+  // SDK do Firebase e fontes: cache primeiro, para o login e o app abrirem offline
+  if (url.hostname === 'www.gstatic.com' || url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+    e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+      const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {}); return res;
+    })));
+    return;
+  }
   if (url.origin !== location.origin) return;
   e.respondWith(
     fetch(e.request).then(res => {
