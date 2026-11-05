@@ -1,4 +1,4 @@
-# Agenda de Posts — A&L
+# A&L Production — Agenda de Posts
 
 App mobile (PWA) para planejar, produzir, aprovar e acompanhar os posts dos clientes. Calendário por mês e por semana, editor com foto + legenda e preview estilo Instagram, plano do mês baseado no modelo de cronograma, relatório mensal, avisos de produção, assistente por regras, radar de conteúdo com IA e sincronização entre celulares.
 
@@ -26,6 +26,7 @@ Para atualizar: troque os arquivos e faça commit. O `sw.js` usa "rede primeiro"
 
 ## O que o app faz
 
+- **Início** — tela inicial com a identidade A&L: saudação, contadores (hoje, a produzir, atrasados), avisos de prospecção, atalhos, próximo post, meta da semana por cliente, produção pendente e posts da semana.
 - **Agenda** — mês (calendário) ou **semana** (grade clientes × dias; toque numa célula para ver o dia ou criar post; setas ‹ › nos cards movem o post de dia).
 - **Hoje** — próximo post, **produção pendente** (posts dos próximos 7 dias sem foto, sem legenda ou sem aprovação), posts de hoje e da semana.
 - **Editor de post** — cliente, data/hora, formato, fotos, título, legenda com contador, **pilar, objetivo, responsável, link do arquivo**, status com o fluxo do modelo (Ideia → Roteiro → Em design → Aguardando aprovação → Aprovado → Agendado → Publicado), **checklist antes de agendar** e **métricas** depois de publicado (alcance, curtidas, comentários, salvamentos, compartilhamentos, cliques).
@@ -71,6 +72,14 @@ Para as duas verem e editarem o mesmo cronograma, o app usa o **Realtime Databas
 6. Toque **Copiar convite** (ou **Compartilhar link**) e mande para o outro celular. Ao abrir o link, a sincronização liga sozinha. Também dá para usar **Colar convite recebido**.
 
 Como funciona: cada post e cliente tem um carimbo de hora; a edição mais recente vence. As fotos sobem uma vez e são baixadas no outro aparelho quando faltam. Sem internet o app continua funcionando e envia as mudanças quando voltar. Notificações e ajustes são por aparelho (não sincronizam). A chave da IA também não sincroniza.
+
+## Prospecção de clientes (IA)
+
+Em **Clientes › Prospecção**. Escolha os bairros (Barra, Recreio, Tijuca, Zona Sul etc.), os segmentos e toque **Buscar possíveis clientes**. A IA pesquisa na web negócios pequenos e médios com ponto físico nesses bairros que não têm Instagram, têm Instagram fraco ou abriram há pouco, e devolve de 8 a 12 leads com segmento, bairro, endereço, @, telefone, sinais de oportunidade, abordagem sugerida para a visita, prioridade e fonte. Negócios já na lista ou já clientes não se repetem.
+
+Cada lead tem links de Instagram, mapa, site e WhatsApp, status (Novo → Contatado → Visita marcada → Proposta → Fechado/Perdido), prioridade, próximo passo com data e anotações. **Roteiro de visitas** agrupa os leads ativos por bairro em um texto para WhatsApp. **Virar cliente** cria o cliente a partir do lead. Em Ajustes dá para ligar um lembrete semanal; o app avisa na tela inicial quando a busca está vencida (a busca nunca roda sozinha, para não gerar custo sem querer).
+
+Importante: a IA pode errar ou citar um negócio que fechou. Leads marcados "a verificar" precisam de conferência no Google Maps ou Instagram antes da visita. Cada busca custa cerca de US$ 0,30 a 0,50 (até 10 buscas na web com o Sonnet 5.5).
 
 ## Radar de conteúdo (IA)
 
