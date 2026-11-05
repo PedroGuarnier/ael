@@ -568,7 +568,9 @@
       <p>Com uma chave da API da Anthropic (Claude), o app estuda o perfil de cada cliente e pesquisa na internet tendências e virais do nicho, sugerindo posts adaptados. A chave fica só neste aparelho e cada pesquisa custa alguns centavos de dólar.</p>
       <label class="field">Chave da API (sk-ant-…)</label>
       <input class="input" id="aiKey" placeholder="sk-ant-api03-…" autocapitalize="none" autocomplete="off">
-      <div class="hint">Crie em console.anthropic.com › API Keys. O radar fica em Clientes › perfil › <b>Radar de conteúdo</b>.</div>
+      <label class="field">ID do workspace (se a API pedir)</label>
+      <input class="input" id="aiWs" placeholder="wrkspc_…" autocapitalize="none" autocomplete="off">
+      <div class="hint">Crie a chave em console.anthropic.com › API Keys. Se aparecer o erro "must include the anthropic-workspace-id header", copie o ID em console.anthropic.com › Settings › Workspaces (começa com <code>wrkspc_</code>) e cole acima. O radar fica em Clientes › perfil › <b>Radar de conteúdo</b>.</div>
     </div>
     <div class="card">
       <h4>Agenda do celular</h4>
@@ -1412,14 +1414,16 @@ $('#repPdf').onclick=()=>{const d=reportData(repId,repYm);$('#printArea').innerH
 const AI={
   key(){try{return localStorage.getItem('al_ai_key')||'';}catch{return '';}},
   setKey(k){try{if(k)localStorage.setItem('al_ai_key',k);else localStorage.removeItem('al_ai_key');}catch{}},
+  ws(){try{return localStorage.getItem('al_ai_ws')||'';}catch{return '';}},
+  setWs(k){try{if(k)localStorage.setItem('al_ai_ws',k);else localStorage.removeItem('al_ai_ws');}catch{}},
   async call({system,messages,tools,maxTokens}){
     const key=this.key();if(!key)throw new Error('Cadastre a chave da API em Ajustes › Radar de conteúdo.');
     let msgs=messages.slice(),text='';
     for(let i=0;i<4;i++){
       const body={model:'claude-sonnet-5-5',max_tokens:maxTokens||16000,fallbacks:'default',system,messages:msgs};if(tools)body.tools=tools;
-      let r;try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','anthropic-beta':'server-side-fallback-2026-07-01'},body:JSON.stringify(body)});}catch{throw new Error('Sem conexão com a internet ou com a API.');}
+      let r;try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:Object.assign({'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','anthropic-beta':'server-side-fallback-2026-07-01'},this.ws()?{'anthropic-workspace-id':this.ws()}:{}),body:JSON.stringify(body)});}catch{throw new Error('Sem conexão com a internet ou com a API.');}
       const j=await r.json().catch(()=>({}));
-      if(!r.ok){const m=(j.error&&j.error.message)||('Erro '+r.status);throw new Error(r.status===401?'Chave da API inválida ou sem crédito.':m);}
+      if(!r.ok){const m=(j.error&&j.error.message)||('Erro '+r.status);if(/anthropic-workspace-id/.test(m))throw new Error('A chave não tem workspace. Cole o ID do workspace (wrkspc_…) em Ajustes › Radar de conteúdo, ou crie a chave dentro de um workspace.');throw new Error(r.status===401?'Chave da API inválida ou sem crédito.':m);}
       if(j.stop_reason==='refusal')throw new Error('A IA não pôde atender este pedido'+(j.stop_details&&j.stop_details.explanation?': '+j.stop_details.explanation:'.'));
       text+=(j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
       if(j.stop_reason==='pause_turn'){msgs=msgs.concat([{role:'assistant',content:j.content}]);continue;}
@@ -1473,6 +1477,7 @@ async function searchTrends(b){
   radarBusy=false;renderRadar();
 }
 $('#leadRemind').value=String(cfg.leadRemind||0);$('#leadRemind').onchange=e=>{cfg.leadRemind=Number(e.target.value);persist();renderHome();};
+$('#aiWs').value=AI.ws();$('#aiWs').onchange=e=>{AI.setWs(e.target.value.trim());toast(e.target.value.trim()?'Workspace salvo':'Workspace removido','',null,1400);};
 $('#aiKey').value=AI.key();$('#aiKey').onchange=e=>{AI.setKey(e.target.value.trim());toast(e.target.value.trim()?'Chave salva neste aparelho':'Chave removida','',null,1500);};
 
 // ============================================================ PROSPECÇÃO (leads)
