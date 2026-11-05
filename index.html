@@ -652,7 +652,7 @@
     <div class="card">
       <h4>Sincronizar entre celulares</h4>
       <div class="sync-st" id="syncStatus"><i></i><span>Desligado — os dados ficam só neste aparelho</span></div>
-      <p id="syncText">Para vocês duas verem o mesmo cronograma, o app usa um projeto gratuito do Firebase (Google). Configure uma vez e mande o convite para o outro celular.</p>
+      <p id="syncText">Para vocês duas verem o mesmo cronograma, o app usa um projeto gratuito do Firebase (Google). Configure uma vez e mande o convite para o outro celular: posts, clientes, leads e as chaves da IA e do mapa chegam sozinhos.</p>
       <div id="syncSetup">
         <label class="field">Configuração do Firebase (já preenchida com o projeto da A&L)</label>
         <textarea class="code" id="syncConfig" placeholder='Cole aqui o trecho "const firebaseConfig = { apiKey: ..., databaseURL: ..., projectId: ... }" do console do Firebase'></textarea>
@@ -685,7 +685,7 @@
     </div>
     <div class="card">
       <h4>Mapa da prospecção</h4>
-      <p>A varredura de bairros usa o <b>OpenStreetMap</b>, que é gratuito e não precisa de chave. Se um dia quiserem a cobertura maior do Google Maps (com avaliações), cole uma chave abaixo e o app passa a usar o Google.</p>
+      <p>A varredura de bairros usa o <b>OpenStreetMap</b>, que é gratuito e não precisa de chave. Se um dia quiserem a cobertura maior do Google Maps (com avaliações), cole uma chave abaixo e o app passa a usar o Google. Com a sincronização ligada, a chave vai para o outro celular também.</p>
       <label class="field">Chave do Google Maps (opcional)</label>
       <input class="input" id="placesKey" placeholder="AIza…" autocapitalize="none" autocomplete="off">
       <details class="fold" style="margin-top:10px"><summary>Como criar a chave (10 min)</summary>
@@ -700,7 +700,7 @@
     </div>
     <div class="card">
       <h4>Radar de conteúdo (IA)</h4>
-      <p>Com uma chave da API da Anthropic (Claude), o app estuda o perfil de cada cliente e pesquisa na internet tendências e virais do nicho, sugerindo posts adaptados. A chave fica só neste aparelho e cada pesquisa custa alguns centavos de dólar.</p>
+      <p>Com uma chave da API da Anthropic (Claude), o app estuda o perfil de cada cliente e pesquisa na internet tendências e virais do nicho, sugerindo posts adaptados. Cada pesquisa custa alguns centavos de dólar. Com a sincronização ligada, a chave é compartilhada automaticamente com o outro celular da equipe.</p>
       <label class="field">Chave da API (sk-ant-…)</label>
       <input class="input" id="aiKey" placeholder="sk-ant-api03-…" autocapitalize="none" autocomplete="off">
       <label class="field">ID do workspace (se a API pedir)</label>
@@ -1554,9 +1554,9 @@ $('#repPdf').onclick=()=>{const d=reportData(repId,repYm);$('#printArea').innerH
 // ============================================================ RADAR DE CONTEÚDO (IA)
 const AI={
   key(){try{return localStorage.getItem('al_ai_key')||'';}catch{return '';}},
-  setKey(k){try{if(k)localStorage.setItem('al_ai_key',k);else localStorage.removeItem('al_ai_key');}catch{}},
+  setKey(k,fromRemote){try{if(k)localStorage.setItem('al_ai_key',k);else localStorage.removeItem('al_ai_key');}catch{}if(!fromRemote)SYNC.pushKeys({ai:k||''});},
   ws(){try{return localStorage.getItem('al_ai_ws')||'';}catch{return '';}},
-  setWs(k){try{if(k)localStorage.setItem('al_ai_ws',k);else localStorage.removeItem('al_ai_ws');}catch{}},
+  setWs(k,fromRemote){try{if(k)localStorage.setItem('al_ai_ws',k);else localStorage.removeItem('al_ai_ws');}catch{}if(!fromRemote)SYNC.pushKeys({aiws:k||''});},
   async call({system,messages,tools,maxTokens}){
     const key=this.key();if(!key)throw new Error('Cadastre a chave da API em Ajustes › Radar de conteúdo.');
     let msgs=messages.slice(),text='';
@@ -1690,7 +1690,7 @@ const AREA_EXPAND={'Zona Sul':['Copacabana','Ipanema','Leblon','Botafogo','Flame
 const DEFAULT_FIREBASE={apiKey:"AIzaSyAASVfwUN6K3H3Nz1iVnsgb5iIqcp2ajvg",authDomain:"plataformaael.firebaseapp.com",databaseURL:"https://plataformaael-default-rtdb.europe-west1.firebasedatabase.app",projectId:"plataformaael",storageBucket:"plataformaael.firebasestorage.app",messagingSenderId:"88173505536",appId:"1:88173505536:web:465b24bbea282838f43ce5"};
 const PLACES={
   key(){try{return localStorage.getItem('al_places_key')||'';}catch{return '';}},
-  setKey(k){try{if(k)localStorage.setItem('al_places_key',k);else localStorage.removeItem('al_places_key');}catch{}},
+  setKey(k,fromRemote){try{if(k)localStorage.setItem('al_places_key',k);else localStorage.removeItem('al_places_key');}catch{}if(!fromRemote)SYNC.pushKeys({places:k||''});},
   cands:load('al_places_cands',[]),busy:false,lib:null,
   load(){if(this.lib)return Promise.resolve(this.lib);const key=this.key();if(!key)return Promise.reject(new Error('Cadastre a chave do Google Maps em Ajustes.'));
     return new Promise((res,rej)=>{const done=()=>google.maps.importLibrary('places').then(l=>{this.lib=l;res(l);}).catch(rej);
@@ -1803,7 +1803,14 @@ const SYNC={
       r.on('child_changed',s=>self.onRemote(col,s.key,s.val()));
       r.on('child_removed',s=>self.onRemoved(col,s.key));});
     self.ref.child('brands').once('value').then(()=>self.ref.child('posts').once('value')).then(()=>self.ref.child('leads').once('value')).then(()=>{self.initial=true;self.reconcile();}).catch(e=>{self.err='Sem permissão: '+(e.code||e.message);self.renderStatus();});
-    firebase.database().ref('.info/connected').on('value',s=>{self.conn=!!s.val();self.renderStatus();if(self.conn&&self.initial){self.push();self.fetchMissing();}});},
+    firebase.database().ref('.info/connected').on('value',s=>{self.conn=!!s.val();self.renderStatus();if(self.conn&&self.initial){self.push();self.fetchMissing();}});
+    self.ref.child('keys').on('value',s=>self.onKeys(s.val()||{}),()=>{});},
+  // ---- chaves da equipe (IA, workspace, Google) viajam pelo sync
+  onKeys(k){let got=0;const local={ai:AI.key(),aiws:AI.ws(),places:PLACES.key()};const missing={};
+    [['ai',v=>AI.setKey(v,true)],['aiws',v=>AI.setWs(v,true)],['places',v=>PLACES.setKey(v,true)]].forEach(([n,set])=>{if(k[n]===undefined){if(local[n])missing[n]=local[n];return;}if(k[n]!==local[n]){set(k[n]);got++;}});
+    if(Object.keys(missing).length)this.pushKeys(missing);
+    if(got){const a=$('#aiKey'),w=$('#aiWs'),g=$('#placesKey');if(a)a.value=AI.key();if(w)w.value=AI.ws();if(g)g.value=PLACES.key();PLACES.lib=null;toast('Chaves da equipe recebidas','IA e mapa configurados por sincronização',null,2600);if(view==='cli')renderLeads();}},
+  pushKeys(o){if(!this.on||!this.ref)return;this.ref.child('keys').update(o).catch(()=>{});},
   // ---- merge remoto → local
   onRemote(col,id,val){if(!val)return;this.remote[col][id]=1;const arr=this.coll(col);const r=this.norm(col,val,id);const c=this.cmp(r);const i=arr.findIndex(x=>x.id===id);let changed=false;
     if(i<0){arr.push(r);this.hashes[col][id]=c;changed=true;}

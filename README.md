@@ -75,6 +75,8 @@ Para as duas verem e editarem o mesmo cronograma, o app usa o **Realtime Databas
 5. No app: **Ajustes → Sincronizar entre celulares**, cole o trecho, confira o código da equipe (ele funciona como senha; quem tem o código vê e edita tudo) e toque **Ligar sincronização**.
 6. Toque **Copiar convite** (ou **Compartilhar link**) e mande para o outro celular. Ao abrir o link, a sincronização liga sozinha. Também dá para usar **Colar convite recebido**.
 
+Com a sincronização ligada, as chaves da IA, do workspace e do Google Maps também são compartilhadas pelo mesmo canal: quem salvar uma chave num celular, o outro recebe sozinho (elas ficam no nó `keys` do mesmo workspace, protegido pelas mesmas regras e pelo código da equipe).
+
 Como funciona: cada post e cliente tem um carimbo de hora; a edição mais recente vence. As fotos sobem uma vez e são baixadas no outro aparelho quando faltam. Sem internet o app continua funcionando e envia as mudanças quando voltar. Notificações e ajustes são por aparelho (não sincronizam). A chave da IA também não sincroniza.
 
 ## Prospecção de clientes (IA)
