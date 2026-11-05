@@ -81,6 +81,21 @@ Cada lead tem links de Instagram, mapa, site e WhatsApp, status (Novo → Contat
 
 Importante: a IA pode errar ou citar um negócio que fechou. Leads marcados "a verificar" precisam de conferência no Google Maps ou Instagram antes da visita. Cada busca custa cerca de US$ 0,30 a 0,50 (até 10 buscas na web com o Sonnet 5.5).
 
+## Google Maps (Places) na prospecção
+
+Com uma chave do Google Maps, a prospecção ganha o passo **1 · Varrer bairros no Google Maps**: para cada bairro × segmento, o app pede ao Google até 20 negócios abertos, com endereço, telefone, site, nota e quantidade de avaliações. Os candidatos são ordenados por sinais de oportunidade (sem site, poucas avaliações, nota alta com pouca gente avaliando). Depois:
+
+- **2 · Avaliar com IA** — manda até 40 candidatos para a IA, que confere o Instagram dos mais promissores na web e escolhe de 8 a 12 leads com sinais e abordagem. Os dados de endereço e telefone vêm do Google, então são confiáveis; só o @ vem da pesquisa da IA.
+- **Adicionar todos** — vira leads sem IA, com prioridade pelos sinais do Google.
+
+Como criar a chave:
+
+1. Em [console.cloud.google.com](https://console.cloud.google.com), use o mesmo projeto do Firebase (ou crie um).
+2. **Faturamento**: vincule um cartão. O Google exige, mas há cota gratuita mensal por tipo de chamada (milhares de buscas) que cobre o uso de vocês. Uma varredura de 5 bairros × 5 segmentos são 25 chamadas.
+3. **APIs e serviços › Biblioteca**: ative **Places API (New)** e **Maps JavaScript API**.
+4. **APIs e serviços › Credenciais › Criar credenciais › Chave de API**. Edite a chave: em restrições de aplicativo escolha **Sites** e adicione `https://pedroguarnier.github.io/*`; em restrições de API marque só as duas APIs acima. Assim a chave não serve em outro site.
+5. Cole em **Ajustes › Google Maps (Places)**. A chave fica só no aparelho.
+
 ## Radar de conteúdo (IA)
 
 Usa a API da Anthropic (Claude) direto do celular, com a sua chave. Em **Ajustes → Radar de conteúdo**, cole a chave (`sk-ant-…`, criada em console.anthropic.com → API Keys). A chave fica só no aparelho e não entra no backup.

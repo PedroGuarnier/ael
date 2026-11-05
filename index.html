@@ -473,7 +473,14 @@
         <input class="input" id="leadSegs" placeholder="clínicas, estética, restaurantes, academias, pet, lojas de bairro">
         <label class="field">Observação para a busca (opcional)</label>
         <input class="input" id="leadExtra" placeholder="Ex.: negócios abertos recentemente, com boas avaliações no Google">
-        <button class="btn" id="leadSearch" style="margin-top:12px">Buscar possíveis clientes</button>
+        <button class="btn" id="placesScan" style="margin-top:12px">1 · Varrer bairros no Google Maps</button>
+        <div class="hint" id="placesStatus"></div>
+        <div id="placesBox" class="hidden">
+          <div class="hint" id="placesSummary" style="margin:8px 0"></div>
+          <div class="row"><button class="btn" id="placesAi">2 · Avaliar com IA</button><button class="btn ghost" id="placesAddAll">Adicionar todos</button></div>
+          <div class="hint">A IA confere Instagram e presença digital dos candidatos e escolhe os melhores. "Adicionar todos" usa só os sinais do Google (sem site, poucas avaliações).</div>
+        </div>
+        <button class="btn ghost" id="leadSearch" style="margin-top:12px">Buscar só com a IA (sem Google Maps)</button>
         <div class="row" style="margin-top:8px"><button class="btn ghost" id="leadRoute">Roteiro de visitas</button><button class="btn ghost" id="leadAddManual">+ Lead manual</button></div>
         <div class="hint" id="leadLast"></div>
       </div>
@@ -540,6 +547,21 @@
       <p>A busca de leads fica em Clientes › Prospecção. Aqui você só escolhe se o app deve lembrar de rodar a busca toda semana.</p>
       <label class="field">Lembrete semanal de prospecção</label>
       <select class="select" id="leadRemind"><option value="0">Desligado</option><option value="7">Toda semana</option><option value="14">A cada 2 semanas</option></select>
+    </div>
+    <div class="card">
+      <h4>Google Maps (Places)</h4>
+      <p>Com uma chave do Google Maps, a prospecção varre os bairros e lista todos os negócios de cada segmento, com endereço, telefone, site e avaliações. Tem cota gratuita mensal que cobre o uso de vocês.</p>
+      <label class="field">Chave da API do Google Maps</label>
+      <input class="input" id="placesKey" placeholder="AIza…" autocapitalize="none" autocomplete="off">
+      <details class="fold" style="margin-top:10px"><summary>Como criar a chave (10 min)</summary>
+        <ol class="steps" style="margin-top:8px">
+          <li><span>Entre em <b>console.cloud.google.com</b>. Pode usar o mesmo projeto do Firebase.</span></li>
+          <li><span>Em <b>Faturamento</b>, vincule um cartão (o Google exige, mas a cota gratuita cobre o uso normal).</span></li>
+          <li><span>Em <b>APIs e serviços › Biblioteca</b>, ative <b>Places API (New)</b> e <b>Maps JavaScript API</b>.</span></li>
+          <li><span>Em <b>APIs e serviços › Credenciais › Criar credenciais › Chave de API</b>. Depois edite a chave: restrição de aplicativo <b>Sites</b> com <code>https://pedroguarnier.github.io/*</code>, e restrição de API para as duas APIs acima.</span></li>
+          <li><span>Cole a chave acima.</span></li>
+        </ol>
+      </details>
     </div>
     <div class="card">
       <h4>Radar de conteúdo (IA)</h4>
@@ -1463,7 +1485,7 @@ function renderLeads(){
   const ar=$('#leadAreas');ar.innerHTML='';AREAS.forEach(a=>{const el=document.createElement('button');el.className='chip'+(cfg.leadAreas.includes(a)?' active':'');el.textContent=a;el.onclick=()=>{cfg.leadAreas=cfg.leadAreas.includes(a)?cfg.leadAreas.filter(x=>x!==a):[...cfg.leadAreas,a];persist();renderLeads();};ar.appendChild(el);});
   if(document.activeElement!==$('#leadSegs'))$('#leadSegs').value=cfg.leadSegs||'';if(document.activeElement!==$('#leadExtra'))$('#leadExtra').value=cfg.leadExtra||'';
   $('#leadLast').textContent=cfg.leadLast?'Última busca: '+new Date(cfg.leadLast).toLocaleDateString('pt-BR')+' · '+leads.length+' leads na lista':(leads.length?leads.length+' leads na lista':'Nenhuma busca ainda.');
-  const sb=$('#leadSearch');sb.disabled=!!leadBusy;sb.innerHTML=leadBusy?'<span class="spin"></span>Pesquisando (1–2 min)…':'Buscar possíveis clientes';
+  const sb=$('#leadSearch');sb.disabled=!!leadBusy;sb.innerHTML=leadBusy?'<span class="spin"></span>Pesquisando (1–2 min)…':'Buscar só com a IA (sem Google Maps)';const ab=$('#placesAi');ab.disabled=!!leadBusy;ab.innerHTML=leadBusy?'<span class="spin"></span>Avaliando…':'2 · Avaliar com IA';PLACES.renderStatus();
   const fl=$('#leadFilter');fl.innerHTML='';const filters=[['ativos','Ativos'],['novo','Novos'],['contatado','Contatados'],['visita','Visita'],['proposta','Proposta'],['fechado','Fechados'],['perdido','Perdidos'],['todos','Todos']];
   filters.forEach(([k,l])=>{const el=document.createElement('button');el.className='chip'+(cfg.leadFilter===k?' active':'');el.textContent=l;el.onclick=()=>{cfg.leadFilter=k;persist();renderLeads();};fl.appendChild(el);});
   const f=cfg.leadFilter;const arr=leads.filter(l=>f==='todos'||(f==='ativos'?!['fechado','perdido'].includes(l.status):l.status===f)).sort((x,y)=>({alta:0,media:1,baixa:2}[x.priority]-{alta:0,media:1,baixa:2}[y.priority])||(y.createdAt-x.createdAt));
@@ -1515,6 +1537,60 @@ async function searchLeads(){
   leadBusy=false;renderLeads();renderHome();
 }
 $('#leadSearch').onclick=searchLeads;
+
+// ============================================================ GOOGLE PLACES (varredura de bairros)
+const AREA_GEO={'Barra da Tijuca':[-23.0003,-43.3659],'Recreio':[-23.0210,-43.4700],'Jacarepaguá':[-22.9460,-43.3800],'Tijuca':[-22.9240,-43.2340],'Vila Isabel':[-22.9150,-43.2470],'Copacabana':[-22.9711,-43.1822],'Ipanema':[-22.9838,-43.2048],'Leblon':[-22.9840,-43.2240],'Botafogo':[-22.9519,-43.1880],'Flamengo':[-22.9320,-43.1750],'Laranjeiras':[-22.9340,-43.1870],'Jardim Botânico':[-22.9640,-43.2240],'Gávea':[-22.9780,-43.2300],'Centro':[-22.9068,-43.1770]};
+const AREA_EXPAND={'Zona Sul':['Copacabana','Ipanema','Leblon','Botafogo','Flamengo']};
+const PLACES={
+  key(){try{return localStorage.getItem('al_places_key')||'';}catch{return '';}},
+  setKey(k){try{if(k)localStorage.setItem('al_places_key',k);else localStorage.removeItem('al_places_key');}catch{}},
+  cands:load('al_places_cands',[]),busy:false,lib:null,
+  load(){if(this.lib)return Promise.resolve(this.lib);const key=this.key();if(!key)return Promise.reject(new Error('Cadastre a chave do Google Maps em Ajustes.'));
+    return new Promise((res,rej)=>{const done=()=>google.maps.importLibrary('places').then(l=>{this.lib=l;res(l);}).catch(rej);
+      if(window.google&&google.maps&&google.maps.importLibrary)return done();
+      const s=document.createElement('script');s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(key)+'&loading=async&language=pt-BR&region=BR';s.onload=done;s.onerror=()=>rej(new Error('Não carregou o Google Maps. Confira a chave e se a Maps JavaScript API está ativa.'));document.head.appendChild(s);});},
+  areas(){const out=[];cfg.leadAreas.forEach(a=>(AREA_EXPAND[a]||[a]).forEach(x=>{if(!out.includes(x))out.push(x);}));return out;},
+  segs(){return (cfg.leadSegs||[...new Set(brands.map(b=>b.segment).filter(Boolean))].join(', ')||'clínicas, estética, restaurantes, academias, pet shops, lojas').split(',').map(x=>x.trim()).filter(Boolean);},
+  score(c){let s=0;if(!c.website)s+=2;if(c.ratingCount<20)s+=2;else if(c.ratingCount<60)s+=1;if(c.rating>=4.5&&c.ratingCount<60)s+=1;return s;},
+  signals(c){const p=[];p.push(c.website?'tem site':'sem site');p.push(c.ratingCount?`${c.ratingCount} ${c.ratingCount>1?'avaliações':'avaliação'} (${String(c.rating||'—').replace('.',',')}★) no Google`:'sem avaliações no Google');return p.join(' · ');},
+  async scan(){
+    if(this.busy)return;const areas=this.areas(),segs=this.segs();if(!areas.length){toast('Escolha pelo menos um bairro','',null,1500);return;}
+    this.busy=true;this.renderStatus('Carregando Google Maps…');
+    try{const {Place}=await this.load();const known=new Set([...brands.map(b=>b.name),...leads.map(l=>l.name)].map(x=>norm(x)));const seen=new Set(this.cands.map(c=>c.placeId));let n=0,q=0;const total=areas.length*segs.length;
+      for(const a of areas){for(const sg of segs){q++;this.renderStatus(`Buscando ${sg} em ${a}… (${q}/${total})`);
+        const req={textQuery:`${sg} em ${a}, Rio de Janeiro`,fields:['id','displayName','formattedAddress','location','rating','userRatingCount','websiteURI','nationalPhoneNumber','businessStatus','googleMapsURI','primaryTypeDisplayName'],language:'pt-BR',region:'br',maxResultCount:20};
+        if(AREA_GEO[a])req.locationBias={center:{lat:AREA_GEO[a][0],lng:AREA_GEO[a][1]},radius:2500};
+        let places=[];try{({places}=await Place.searchByText(req));}catch(e){throw new Error('Google Maps recusou a busca: '+(e.message||e)+'. Confira se a Places API (New) está ativa e se a chave permite este site.');}
+        places.forEach(pl=>{if(pl.businessStatus&&pl.businessStatus!=='OPERATIONAL')return;if(seen.has(pl.id))return;const name=pl.displayName||'';if(!name||known.has(norm(name)))return;seen.add(pl.id);
+          const addr=pl.formattedAddress||'';const inArea=norm(addr).includes(norm(a));
+          this.cands.push({placeId:pl.id,name,segment:(pl.primaryTypeDisplayName||sg),query:sg,area:inArea?a:(areas.find(x=>norm(addr).includes(norm(x)))||a),address:addr.replace(/, Brasil$/,''),phone:pl.nationalPhoneNumber||'',website:pl.websiteURI||'',rating:pl.rating||0,ratingCount:pl.userRatingCount||0,maps:pl.googleMapsURI||''});n++;});}}
+      this.cands.sort((x,y)=>this.score(y)-this.score(x));save('al_places_cands',this.cands);cfg.placesLast=Date.now();persist();
+      this.renderStatus('');toast(n+' candidatos novos',this.cands.length+' no total · avalie com IA ou adicione',null,2600);}
+    catch(e){this.renderStatus('');toast('A varredura falhou',e.message,null,5000);}
+    this.busy=false;renderLeads();},
+  renderStatus(t){const el=$('#placesStatus');if(!el)return;const sb=$('#placesScan');sb.disabled=!!this.busy;sb.innerHTML=this.busy?'<span class="spin"></span>'+(t||'Varrendo…'):'1 · Varrer bairros no Google Maps';
+    el.textContent=this.busy?'':(this.key()?(cfg.placesLast?'Última varredura: '+new Date(cfg.placesLast).toLocaleDateString('pt-BR'):'Busca por bairro e segmento, até 20 negócios por combinação.'):'Cadastre a chave do Google Maps em Ajustes para usar a varredura.');
+    const box=$('#placesBox');box.classList.toggle('hidden',!this.cands.length);if(this.cands.length){const hi=this.cands.filter(c=>this.score(c)>=4).length;$('#placesSummary').innerHTML=`<b>${this.cands.length} candidatos</b> encontrados (${hi} com sinais fortes: sem site e poucas avaliações). Bairros: ${[...new Set(this.cands.map(c=>c.area))].join(', ')}.`;}},
+  toLead(c,extra){const sc=this.score(c);return normLead(Object.assign({id:uid(),createdAt:Date.now(),name:c.name,segment:c.segment||'',area:c.area||'',address:c.address||'',instagram:'',site:c.website||'',phone:c.phone||'',signals:this.signals(c),pitch:'',priority:sc>=4?'alta':sc>=2?'media':'baixa',source:c.maps||'',status:'novo',notes:`Google: ${c.rating||'—'}★ · ${c.ratingCount} avaliações`,next:'',nextDate:''},extra||{}));},
+  addAll(){if(!this.cands.length)return;confirmBox(`Adicionar ${this.cands.length} candidatos como leads (prioridade pelos sinais do Google)?`,()=>{let n=0;const known=new Set(leads.map(l=>norm(l.name)));this.cands.slice().reverse().forEach(c=>{if(known.has(norm(c.name)))return;leads.unshift(this.toLead(c));n++;});this.cands=[];save('al_places_cands',this.cands);cfg.leadFilter='novo';persist();renderLeads();renderHome();toast(n+' leads adicionados','',null,2000);});},
+  async evaluate(){
+    if(leadBusy)return;if(!AI.key()){toast('Cadastre a chave da API da Anthropic em Ajustes','',null,2200);return;}if(!this.cands.length)return;
+    leadBusy=true;renderLeads();
+    const batch=this.cands.slice(0,40);
+    try{const text=await AI.call({system:'Você é pesquisador de prospecção (SDR) de uma agência de social media de duas sócias no Rio de Janeiro, que visitam clientes presencialmente. Você recebe uma lista de negócios REAIS vindos do Google Maps. Sua tarefa é avaliar a presença digital de cada um (principalmente Instagram) e escolher os melhores alvos. Use a busca na web para checar Instagram dos candidatos mais promissores (busque "<nome> <bairro> instagram"). Nunca invente @; se não achar, deixe vazio e diga "não encontrei Instagram". Responda em português do Brasil e termine com APENAS um bloco ```json no formato pedido.',
+        messages:[{role:'user',content:`Hoje é ${ymd(today)}.\nCandidatos (dados do Google Maps):\n${batch.map((c,i)=>`${i+1}. [${c.placeId}] ${c.name} · ${c.segment} · ${c.area} · ${c.address} · ${c.rating||'—'}★ (${c.ratingCount} avaliações) · site: ${c.website||'não'} · tel: ${c.phone||'não'}`).join('\n')}\n\nBom lead: negócio pequeno/médio com ponto físico que não tem Instagram, ou tem Instagram parado/fraco (poucos seguidores, posts irregulares, sem Reels, fotos ruins), ou abriu recentemente, ou tem boas avaliações mas presença digital fraca. Priorize pela probabilidade de fechar e pelo potencial de pagar um serviço de social media.\n\nEscolha de 8 a 12 e, para cada um, escreva em "sinais" o que encontrou (Instagram, seguidores aproximados, frequência de posts, site) e em "abordagem" um gancho concreto para a visita presencial, específico do negócio.\n\nFormato final (apenas isto, dentro de \`\`\`json):\n{"leads":[{"place_id":"","instagram":"@ ou vazio","sinais":"","abordagem":"","prioridade":"alta|media|baixa"}]}`}],
+        tools:[{type:'web_search_20260209',name:'web_search',max_uses:12,user_location:{type:'approximate',city:'Rio de Janeiro',region:'Rio de Janeiro',country:'BR',timezone:'America/Sao_Paulo'}}],maxTokens:16000});
+      const j=AI.json(text);if(!j||!Array.isArray(j.leads))throw new Error('A resposta veio fora do formato. Tente de novo.');
+      let n=0;const known=new Set(leads.map(l=>norm(l.name)));const used=new Set();
+      j.leads.slice().reverse().forEach(x=>{const c=batch.find(b=>b.placeId===x.place_id);if(!c||known.has(norm(c.name)))return;used.add(c.placeId);
+        leads.unshift(this.toLead(c,{instagram:String(x.instagram||'').replace(/^@/,'').replace(/^vazio$/i,''),signals:(x.sinais||this.signals(c))+' · Google: '+this.signals(c),pitch:x.abordagem||'',priority:['alta','media','baixa'].includes(x.prioridade)?x.prioridade:'media'}));n++;});
+      this.cands=this.cands.filter(c=>!used.has(c.placeId)&&!batch.includes(c));save('al_places_cands',this.cands);cfg.leadLast=Date.now();cfg.leadFilter='novo';persist();
+      toast(n+' leads escolhidos pela IA',this.cands.length?this.cands.length+' candidatos restantes para outra rodada':'',null,3000);}
+    catch(e){toast('A avaliação não funcionou',e.message,null,4500);}
+    leadBusy=false;renderLeads();renderHome();}
+};
+$('#placesScan').onclick=()=>PLACES.scan();$('#placesAi').onclick=()=>PLACES.evaluate();$('#placesAddAll').onclick=()=>PLACES.addAll();
+$('#placesKey').value=PLACES.key();$('#placesKey').onchange=e=>{PLACES.setKey(e.target.value.trim());PLACES.lib=null;toast(e.target.value.trim()?'Chave do Google salva neste aparelho':'Chave removida','',null,1500);};
 
 // ============================================================ SINCRONIZAÇÃO (Firebase Realtime Database)
 function stable(v){if(Array.isArray(v))return '['+v.map(stable).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stable(v[k])).join(',')+'}';return JSON.stringify(v===undefined?null:v);}
