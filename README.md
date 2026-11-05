@@ -81,7 +81,7 @@ No perfil do cliente, **Radar**:
 1. **Estudar perfil** — a IA lê ficha, pilares, posts e métricas e escreve um resumo (posicionamento, público, o que funciona, lacunas, direção do mês). Fica salvo no cliente.
 2. **Buscar tendências** — a IA pesquisa na web o que está em alta no nicho no Brasil (formatos, trends, datas comemorativas dos próximos 30 dias) e propõe 6 ideias adaptadas ao cliente, cada uma com formato, pilar, gancho, legenda pronta, justificativa e fonte. Cada ideia tem **Criar post** (abre o editor preenchido) e **Guardar ideia** (banco de ideias).
 
-Custo: cada busca de tendências usa o modelo Opus com pesquisa na web, na faixa de centavos de dólar; o estudo de perfil custa menos. A conta da Anthropic precisa ter crédito.
+Custo: o app usa o modelo Sonnet 5.5. Cada busca de tendências fica na faixa de US$ 0,30 a 0,50 (até 8 buscas na web); o estudo de perfil custa cerca de US$ 0,03. Para 3 clientes com um estudo e duas buscas por mês cada, dá uns US$ 2 a 3 por mês. A conta da Anthropic precisa ter crédito.
 
 ## Notificações — o que funciona onde
 

@@ -1291,7 +1291,7 @@ const AI={
     const key=this.key();if(!key)throw new Error('Cadastre a chave da API em Ajustes › Radar de conteúdo.');
     let msgs=messages.slice(),text='';
     for(let i=0;i<4;i++){
-      const body={model:'claude-opus-5-5',max_tokens:maxTokens||16000,fallbacks:'default',system,messages:msgs};if(tools)body.tools=tools;
+      const body={model:'claude-sonnet-5-5',max_tokens:maxTokens||16000,fallbacks:'default',system,messages:msgs};if(tools)body.tools=tools;
       let r;try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','anthropic-beta':'server-side-fallback-2026-07-01'},body:JSON.stringify(body)});}catch{throw new Error('Sem conexão com a internet ou com a API.');}
       const j=await r.json().catch(()=>({}));
       if(!r.ok){const m=(j.error&&j.error.message)||('Erro '+r.status);throw new Error(r.status===401?'Chave da API inválida ou sem crédito.':m);}
