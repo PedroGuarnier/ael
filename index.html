@@ -519,7 +519,7 @@
       <div class="sync-st" id="syncStatus"><i></i><span>Desligado — os dados ficam só neste aparelho</span></div>
       <p id="syncText">Para vocês duas verem o mesmo cronograma, o app usa um projeto gratuito do Firebase (Google). Configure uma vez e mande o convite para o outro celular.</p>
       <div id="syncSetup">
-        <label class="field">Configuração do Firebase</label>
+        <label class="field">Configuração do Firebase (já preenchida com o projeto da A&L)</label>
         <textarea class="code" id="syncConfig" placeholder='Cole aqui o trecho "const firebaseConfig = { apiKey: ..., databaseURL: ..., projectId: ... }" do console do Firebase'></textarea>
         <label class="field">Código da equipe</label>
         <input class="input" id="syncCode" placeholder="gerado automaticamente" autocapitalize="none">
@@ -1541,6 +1541,7 @@ $('#leadSearch').onclick=searchLeads;
 // ============================================================ GOOGLE PLACES (varredura de bairros)
 const AREA_GEO={'Barra da Tijuca':[-23.0003,-43.3659],'Recreio':[-23.0210,-43.4700],'Jacarepaguá':[-22.9460,-43.3800],'Tijuca':[-22.9240,-43.2340],'Vila Isabel':[-22.9150,-43.2470],'Copacabana':[-22.9711,-43.1822],'Ipanema':[-22.9838,-43.2048],'Leblon':[-22.9840,-43.2240],'Botafogo':[-22.9519,-43.1880],'Flamengo':[-22.9320,-43.1750],'Laranjeiras':[-22.9340,-43.1870],'Jardim Botânico':[-22.9640,-43.2240],'Gávea':[-22.9780,-43.2300],'Centro':[-22.9068,-43.1770]};
 const AREA_EXPAND={'Zona Sul':['Copacabana','Ipanema','Leblon','Botafogo','Flamengo']};
+const DEFAULT_FIREBASE={apiKey:"AIzaSyAASVfwUN6K3H3Nz1iVnsgb5iIqcp2ajvg",authDomain:"plataformaael.firebaseapp.com",databaseURL:"https://plataformaael-default-rtdb.europe-west1.firebasedatabase.app",projectId:"plataformaael",storageBucket:"plataformaael.firebasestorage.app",messagingSenderId:"88173505536",appId:"1:88173505536:web:465b24bbea282838f43ce5"};
 const PLACES={
   key(){try{return localStorage.getItem('al_places_key')||'';}catch{return '';}},
   setKey(k){try{if(k)localStorage.setItem('al_places_key',k);else localStorage.removeItem('al_places_key');}catch{}},
@@ -1662,7 +1663,7 @@ const SYNC={
     if(this.cfg&&this.cfg.code===c.code)return;save('al_sync',c);this.cfg=c;this.hashes={posts:{},brands:{},leads:{}};this.imgs={};this.saveMeta();toast('Convite aceito','Sincronização ligada neste aparelho',null,2500);},
   disable(){try{localStorage.removeItem('al_sync');localStorage.removeItem('al_sync_h');localStorage.removeItem('al_sync_i');}catch{}location.reload();},
   renderStatus(){const s=$('#syncStatus');if(!s)return;const on=!!this.cfg;$('#syncSetup').classList.toggle('hidden',on);$('#syncOn').classList.toggle('hidden',!on);
-    if(!on){s.className='sync-st';s.querySelector('span').textContent='Desligado — os dados ficam só neste aparelho';if(!$('#syncCode').value)$('#syncCode').value=this.genCode();return;}
+    if(!on){s.className='sync-st';s.querySelector('span').textContent='Desligado — os dados ficam só neste aparelho';if(!$('#syncCode').value)$('#syncCode').value=this.genCode();if(!$('#syncConfig').value.trim())$('#syncConfig').value=JSON.stringify(DEFAULT_FIREBASE,null,2);return;}
     const txt=this.err?this.err:(!this.on?(this.starting?'Conectando…':'Aguardando internet'):(this.conn?'Sincronizado · código '+this.cfg.code:'Sem conexão — as alterações serão enviadas quando voltar'));
     s.className='sync-st '+(this.err?'off':(this.on&&this.conn?'on':'wait'));s.querySelector('span').textContent=txt;}
 };
