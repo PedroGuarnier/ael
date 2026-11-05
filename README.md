@@ -81,20 +81,16 @@ Cada lead tem links de Instagram, mapa, site e WhatsApp, status (Novo → Contat
 
 Importante: a IA pode errar ou citar um negócio que fechou. Leads marcados "a verificar" precisam de conferência no Google Maps ou Instagram antes da visita. Cada busca custa cerca de US$ 0,30 a 0,50 (até 10 buscas na web com o Sonnet 5.5).
 
-## Google Maps (Places) na prospecção
+## Mapa da prospecção (OpenStreetMap, sem chave)
 
-Com uma chave do Google Maps, a prospecção ganha o passo **1 · Varrer bairros no Google Maps**: para cada bairro × segmento, o app pede ao Google até 20 negócios abertos, com endereço, telefone, site, nota e quantidade de avaliações. Os candidatos são ordenados por sinais de oportunidade (sem site, poucas avaliações, nota alta com pouca gente avaliando). Depois:
+O passo **1 · Varrer bairros no mapa** consulta o OpenStreetMap (serviço Overpass), que é gratuito e não precisa de chave, cartão nem console do Google. Para cada bairro, o app busca os negócios dos segmentos escolhidos num raio de 2,5 km do centro do bairro, com nome, endereço, telefone, site e Instagram quando cadastrados. Os candidatos são ordenados por sinais de oportunidade (sem site, sem Instagram cadastrado, sem telefone). Depois:
 
-- **2 · Avaliar com IA** — manda até 40 candidatos para a IA, que confere o Instagram dos mais promissores na web e escolhe de 8 a 12 leads com sinais e abordagem. Os dados de endereço e telefone vêm do Google, então são confiáveis; só o @ vem da pesquisa da IA.
-- **Adicionar todos** — vira leads sem IA, com prioridade pelos sinais do Google.
+- **2 · Avaliar com IA** — manda até 40 candidatos para a IA, que confere o Instagram dos mais promissores na web e escolhe de 8 a 12 leads com sinais e abordagem.
+- **Adicionar todos** — vira leads sem IA, com prioridade pelos sinais do mapa.
 
-Como criar a chave:
+Limites: a cobertura do OpenStreetMap no Rio é boa para restaurantes, bares, lojas, salões e academias, e irregular para clínicas e consultórios pequenos. Não há avaliações. Se o serviço estiver ocupado, o app tenta um segundo servidor e pede para repetir em 1 minuto.
 
-1. Em [console.cloud.google.com](https://console.cloud.google.com), use o mesmo projeto do Firebase (ou crie um).
-2. **Faturamento**: vincule um cartão. O Google exige, mas há cota gratuita mensal por tipo de chamada (milhares de buscas) que cobre o uso de vocês. Uma varredura de 5 bairros × 5 segmentos são 25 chamadas.
-3. **APIs e serviços › Biblioteca**: ative **Places API (New)** e **Maps JavaScript API**.
-4. **APIs e serviços › Credenciais › Criar credenciais › Chave de API**. Edite a chave: em restrições de aplicativo escolha **Sites** e adicione `https://pedroguarnier.github.io/*`; em restrições de API marque só as duas APIs acima. Assim a chave não serve em outro site.
-5. Cole em **Ajustes › Google Maps (Places)**. A chave fica só no aparelho.
+Opcional: se um dia quiserem a cobertura do Google Maps (com notas e avaliações), cole uma chave da API do Google Maps em Ajustes › Mapa da prospecção e a varredura passa a usar o Google. Exige projeto no Google Cloud com cartão, Places API (New) e Maps JavaScript API ativas e chave restrita ao site `https://pedroguarnier.github.io/*`.
 
 ## Radar de conteúdo (IA)
 
